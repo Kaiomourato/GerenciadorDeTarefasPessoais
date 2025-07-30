@@ -1,0 +1,65 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4; /* Mantenha esse ou mude */
+    color: #333;
+    text-align: center;
+
+    /* Adicione este estilo para uma confirmação visual forte */
+    background-color: lightblue; /* Mude para uma cor bem chamativa! */
+    border: 5px solid darkblue;  /* Adicione uma borda grossa também */
+}
+
+/* Mantenha o restante do seu CSS abaixo */
+header {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 0;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+h1 {
+    color: #333;
+}
+
+main {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+footer {
+    margin-top: 30px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.task-list {
+    list-style: none; /* Remove os marcadores de lista */
+    padding: 0;
+    text-align: left; /* Alinha o texto da lista à esquerda */
+    max-width: 800px; /* Limita a largura da lista */
+    margin: 20px auto; /* Centraliza a lista na página */
+}
+
+.task-item {
+    background-color: #e9e9e9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 15px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.task-item h3 {
+    margin-top: 0;
+    color: #0056b3;
+}
+
+.task-item p {
+    margin: 5px 0;
+    font-size: 0.95em;
+}
