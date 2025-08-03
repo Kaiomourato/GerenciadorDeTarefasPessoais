@@ -4,13 +4,14 @@ const { Pool } = require('pg');
 const fs = require('fs');
 
 
-const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'GerenciadorDeTarefasPessoais',
-    password: 'KMMoura555!',
-    port: 5432,
+ const pool = new Pool({
+  connectionString: 'postgresql://postgres:Gt_G_K_C_2025@db.dfxcykmesxqihijehgrl.supabase.co:5432/postgres',
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
+
+
 
 
 async function initializeDatabase() {
