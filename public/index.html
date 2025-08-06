@@ -3,27 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gerenciamento de Tarefas Pessoais</title>]
-
+    <title>Sistema de Gerenciamento de Tarefas</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <header>
-        <h1> Bem-vindo ao Sistema de Gerenciamento de Tarefas Pessoais</h1>
+        <h1>Bem-vindo ao Gerenciador de Tarefas!</h1>
     </header>
-
     <main>
-        <h2> Minhas Tarefas</h2>
+        <h2>Adicionar Nova Tarefa</h2>
+        <form id="task-form">
+            <div class="form-group">
+                <label for="title">Título:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Descrição:</label>
+                <textarea id="description" name="description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="due_date">Data de Vencimento:</label>
+                <input type="date" id="due_date" name="due_date" required>
+            </div>
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select id="status" name="status">
+                    <option value="Pendente">Pendente</option>
+                    <option value="Em Progresso">Em Progresso</option>
+                    <option value="Concluída">Concluída</option>
+                    <option value="Cancelada">Cancelada</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="category_id">Categoria:</label>
+                <select id="category_id" name="category_id">
+                    <option value="">Nenhuma</option>
+                    </select>
+            </div>
+            <div class="form-group">
+                <label for="priority_id">Prioridade:</label>
+                <select id="priority_id" name="priority_id">
+                    <option value="">Nenhuma</option>
+                    </select>
+            </div>
+            <button type="submit">Adicionar Tarefa</button>
+        </form>
 
+        <h2>Minhas Tarefas</h2>
         <div id="task-list-container">
-            <p>Carregando Tarefas</p>
+            <p>Carregando tarefas...</p>
         </div>
     </main>
-
     <footer>
-        <p>&copy; 2025 Sistema de Gerenciamento de Tarefas Pessoais</p>
+        <p>&copy; 2025 Sistema de Gerenciamento de Tarefas</p>
     </footer>
-
     <script src="/js/script.js"></script>
 </body>
 </html>
