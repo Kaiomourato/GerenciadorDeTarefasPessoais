@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router(); 
-const { pool } = require('../config/db'); 
+const { pool } = require('../config/supabaseClient'); 
 
 // Listar todas as tarefas
 router.get('/', async (req, res) => {

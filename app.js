@@ -1,7 +1,9 @@
-
 require('dotenv').config();
 const express = require('express');
 
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,9 +11,10 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static('public'));
 
-const tasksRoutes = require('./routes/tasksRoutes');
-app.use('/api/tasks', tasksRoutes);
 
+app.use('/api/tasks', require('./routes/tasksRoutes'));
+app.use('/api/categories', require('./routes/categoriesRoutes'));
+app.use('/api/priorities', require('./routes/prioritiesRoutes'));
 
 
 app.get('/api/tasks', async (req, res) => {
@@ -19,7 +22,7 @@ app.get('/api/tasks', async (req, res) => {
     const { data, error } = await supabase
       .from('tasks')
       .select('*');
-    
+
     if (error) throw error;
     res.json(data);
   } catch (err) {
@@ -32,7 +35,7 @@ app.get('/api/users', async (req, res) => {
     const { data, error } = await supabase
       .from('users')
       .select('*');
-    
+
     if (error) throw error;
     res.json(data);
   } catch (err) {
