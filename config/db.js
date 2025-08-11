@@ -1,14 +1,13 @@
- 
 
 const { Pool } = require('pg');
 const fs = require('fs');
 
 
- const pool = new Pool({
-  connectionString: 'postgresql://postgres:Gt_G_K_C_2025@db.dfxcykmesxqihijehgrl.supabase.co:5432/postgres',
-  ssl: {
-    rejectUnauthorized: false
-  }
+const pool = new Pool({
+    connectionString: 'postgresql://postgres:Gt_G_K_C_2025@db.dfxcykmesxqihijehgrl.supabase.co:5432/postgres',
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
 
@@ -17,13 +16,13 @@ const fs = require('fs');
 async function initializeDatabase() {
     try {
         const client = await pool.connect();
-        const sql = fs.readFileSync('./init_db.sql').toString(); 
+        const sql = fs.readFileSync('./init_db.sql').toString();
         await client.query(sql);
         console.log('✅ Tabelas criadas e dados iniciais inseridos com sucesso!');
         client.release();
     } catch (err) {
         console.error('❌ Erro ao inicializar o banco de dados:', err.stack);
-    
+
     }
 }
 

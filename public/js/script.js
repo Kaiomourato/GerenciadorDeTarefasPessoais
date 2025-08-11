@@ -4,7 +4,7 @@ async function fetchAndDisplayTasks() {
     taskListContainer.innerHTML = '<p>Carregando tarefas...</p>'; // Mensagem de carregamento
 
     try {
-       
+        
         const response = await fetch('/api/tasks');
         
         if (!response.ok) {

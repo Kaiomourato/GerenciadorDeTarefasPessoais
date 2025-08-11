@@ -1,12 +1,7 @@
-// app.js
+
 require('dotenv').config();
 const express = require('express');
-const { createClient } = require('@supabase/supabase-js');
 
-// Configuração do Supabase
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,7 +9,11 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static('public'));
 
-// Rotas básicas para teste da conexão
+const tasksRoutes = require('./routes/tasksRoutes');
+app.use('/api/tasks', tasksRoutes);
+
+
+
 app.get('/api/tasks', async (req, res) => {
   try {
     const { data, error } = await supabase
