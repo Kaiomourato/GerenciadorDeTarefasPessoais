@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
     try {
         const client = await pool.connect();
         const result = await client.query(
-            'INSERT INTO Tasks (title, description, due_date, status, category_id, priority_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;',
+            'INSERT INTO tasks (title, description, due_date, status, category_id, priority_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;',
             [title, description, due_date, status || 'Pendente', category_id, priority_id]
         );
         client.release();
@@ -49,7 +49,7 @@ router.put('/:id', async (req, res) => {
     try {
         const client = await pool.connect();
         const result = await client.query(
-            `UPDATE Tasks SET
+            `UPDATE tasks SET
                 title = $1,
                 description = $2,
                 due_date = $3,
@@ -94,19 +94,17 @@ router.put('/:id/status', async (req, res) => {
     }
 });
 
-// Contar tarefas por usuário via function
-router.get('/count/:userId', async (req, res) => {
-    const userId = parseInt(req.params.userId);
-
+// Contar todas as tarefas via function
+router.get('/total-tasks-function', async (req, res) => {
     try {
         const client = await pool.connect();
-        const result = await client.query('SELECT contar_tarefas_por_usuario($1) AS total', [userId]);
+        const result = await client.query('SELECT contar_todas_as_tarefas() AS total;');
         client.release();
 
         if (result.rows.length > 0) {
-            res.json({ userId, total: result.rows[0].total });
+            res.json({ total: result.rows[0].total });
         } else {
-            res.status(404).json({ error: 'Usuário não encontrado ou sem tarefas.' });
+            res.status(404).json({ error: 'Nenhuma tarefa encontrada.' });
         }
     } catch (err) {
         console.error('Erro ao buscar total de tarefas:', err.stack);
@@ -120,7 +118,7 @@ router.delete('/:id', async (req, res) => {
 
     try {
         const client = await pool.connect();
-        const result = await client.query('DELETE FROM Tasks WHERE task_id = $1;', [taskId]);
+        const result = await client.query('DELETE FROM tasks WHERE task_id = $1;', [taskId]);
         client.release();
 
         if (result.rowCount === 0) {
@@ -147,8 +145,8 @@ router.get('/details', async (req, res) => {
                 c.category_name,
                 p.priority_name
             FROM tasks t
-            LEFT JOIN categories c ON t.category_id = c.category_id  -- Agora inclui NULLs
-            LEFT JOIN priorities p ON t.priority_id = p.priority_id  -- Agora inclui NULLs
+            LEFT JOIN categories c ON t.category_id = c.category_id 
+            LEFT JOIN priorities p ON t.priority_id = p.priority_id 
             ORDER BY t.due_date ASC;
         `;
         const result = await client.query(queryText);

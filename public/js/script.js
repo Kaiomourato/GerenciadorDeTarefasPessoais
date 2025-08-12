@@ -1,9 +1,6 @@
 async function fetchAndDisplayTasks() {
     const taskListContainer = document.getElementById('task-list-container');
     taskListContainer.innerHTML = '<p>Carregando tarefas...</p>';
-
-    
-
     try {
         
         const response = await fetch('/api/tasks/details'); 
@@ -46,24 +43,6 @@ async function fetchAndDisplayTasks() {
                 </div>
             `;
             ul.appendChild(li);
-        });
-
-        
-        taskListContainer.addEventListener('click', async (event) => {
-            if (event.target.classList.contains('delete-btn')) {
-                const taskId = event.target.closest('.task-item').dataset.taskId;
-                if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
-                    await deleteTask(taskId);
-                }
-            }
-            if (event.target.classList.contains('update-status-btn')) {
-                const taskId = event.target.closest('.task-item').dataset.taskId;
-                const currentStatus = event.target.dataset.status;
-                const newStatus = prompt('Digite o novo status (Pendente, Em Progresso, Concluída, Cancelada):', currentStatus);
-                if (newStatus) {
-                    await updateTaskStatus(taskId, newStatus);
-                }
-            }
         });
 
         taskListContainer.appendChild(ul);
@@ -150,6 +129,24 @@ async function addNewTask(event) {
     } catch (error) {
         console.error('Erro ao adicionar tarefa:', error);
         alert(`Não foi possível adicionar a tarefa: ${error.message}`);
+    }
+}
+
+async function countAllTasksFunction() {
+    const taskCountResult = document.getElementById('taskCountResultFunction');
+    taskCountResult.innerHTML = '<p>Contando tarefas...</p>';
+
+    try {
+        const response = await fetch('/api/tasks/total-tasks-function');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || response.statusText);
+        }
+        const data = await response.json();
+        taskCountResult.innerHTML = `<p>O total de tarefas cadastradas é: **${data.total}**.</p>`;
+    } catch (error) {
+        console.error('Erro ao contar todas as tarefas:', error);
+        taskCountResult.innerHTML = `<p style="color: red;">Erro: ${error.message}</p>`;
     }
 }
 
@@ -329,6 +326,26 @@ async function deletePriority(id) {
     }
 }
 
+async function countUserTasks(event) {
+    event.preventDefault();
+    const userId = document.getElementById('userIdInput').value;
+    const taskCountResult = document.getElementById('taskCountResult');
+    taskCountResult.innerHTML = '<p>Contando tarefas...</p>';
+
+    try {
+        const response = await fetch(`/api/tasks/count/${userId}`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || response.statusText);
+        }
+        const data = await response.json();
+        taskCountResult.innerHTML = `<p>O usuário ${data.userId} possui um total de **${data.total}** tarefas.</p>`;
+    } catch (error) {
+        console.error('Erro ao contar tarefas:', error);
+        taskCountResult.innerHTML = `<p style="color: red;">Erro: ${error.message}</p>`;
+    }
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -337,6 +354,17 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchAndDisplayStatusSummary();
     fetchAndDisplayCategories(); 
     fetchAndDisplayPriorities(); 
+
+
+    const countAllTasksFunctionBtn = document.getElementById('countAllTasksFunctionBtn');
+    if (countAllTasksFunctionBtn) {
+        countAllTasksFunctionBtn.addEventListener('click', countAllTasksFunction);
+    }
+    
+    const taskCountForm = document.getElementById('taskCountForm');
+    if (taskCountForm) {
+        taskCountForm.addEventListener('submit', countUserTasks);
+    }
 
     const taskForm = document.getElementById('task-form');
     if (taskForm) {
@@ -352,5 +380,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const priorityForm = document.getElementById('priorityForm');
     if (priorityForm) {
         priorityForm.addEventListener('submit', createPriority);
+    }
+
+    const taskListContainer = document.getElementById('task-list-container');
+    if (taskListContainer) {
+        taskListContainer.addEventListener('click', async (event) => {
+            const target = event.target;
+            const taskItem = target.closest('.task-item');
+            if (!taskItem) return;
+
+            const taskId = taskItem.dataset.taskId;
+
+            if (target.classList.contains('delete-btn')) {
+                if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+                    await deleteTask(taskId);
+                }
+            }
+
+            if (target.classList.contains('update-status-btn')) {
+                const currentStatus = target.dataset.status;
+                const newStatus = prompt('Digite o novo status (Pendente, Em Progresso, Concluída, Cancelada):', currentStatus);
+                if (newStatus) {
+                    await updateTaskStatus(taskId, newStatus);
+                }
+            }
+        });
     }
 });

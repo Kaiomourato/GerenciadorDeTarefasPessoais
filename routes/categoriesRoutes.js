@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { pool } = require('../config/supabaseClient'); 
 
-
+// Listar Categorias
 router.get('/', async (req, res) => {
     try {
         const client = await pool.connect();
