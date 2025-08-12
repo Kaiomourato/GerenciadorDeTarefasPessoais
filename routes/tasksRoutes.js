@@ -94,6 +94,20 @@ router.put('/:id/status', async (req, res) => {
     }
 });
 
+// Rota para buscar o histórico de uma tarefa
+router.get('/history/:taskId', async (req, res) => {
+    const taskId = req.params.taskId;
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT * FROM task_history WHERE task_id = $1 ORDER BY change_date DESC;', [taskId]);
+        client.release();
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Erro ao buscar histórico da tarefa:', err.stack);
+        res.status(500).json({ error: 'Erro interno do servidor ao buscar histórico da tarefa.' });
+    }
+});
+
 // Contar todas as tarefas via function
 router.get('/total-tasks-function', async (req, res) => {
     try {
