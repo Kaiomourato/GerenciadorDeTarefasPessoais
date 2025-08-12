@@ -18,18 +18,6 @@ app.use('/api/categories', require('./routes/categoriesRoutes'));
 app.use('/api/priorities', require('./routes/prioritiesRoutes'));
 
 
-app.get('/api/tasks', async (req, res) => {
-  try {
-    const { data, error } = await supabase
-      .from('tasks')
-      .select('*');
-
-    if (error) throw error;
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 app.get('/api/users', async (req, res) => {
   try {

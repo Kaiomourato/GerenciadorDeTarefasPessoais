@@ -3,8 +3,8 @@ async function fetchAndDisplayTasks() {
     taskListContainer.innerHTML = '<p>Carregando tarefas...</p>';
 
     try {
-       
-        const response = await fetch('/api/tasks');
+        
+        const response = await fetch('/api/tasks/details'); 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -20,21 +20,48 @@ async function fetchAndDisplayTasks() {
         const ul = document.createElement('ul');
         ul.classList.add('task-list');
 
+        
         tasks.forEach(task => {
             const li = document.createElement('li');
             li.classList.add('task-item');
+            li.dataset.taskId = task.task_id; 
 
-            const dueDate = task.due_date? new Date(task.due_date).toLocaleDateString('pt-BR') : 'N/A';
+            const statusClass = task.status ? `status-${task.status.replace(/\s/g, '')}` : '';
+            const priorityClass = task.priority_name ? `priority-${task.priority_name.replace(/\s/g, '')}` : '';
+
+            const dueDate = task.due_date ? new Date(task.due_date).toLocaleDateString('pt-BR') : 'N/A';
 
             li.innerHTML = `
                 <h3>${task.title}</h3>
                 <p>${task.description || 'Sem descrição'}</p>
                 <p><strong>Vencimento:</strong> ${dueDate}</p>
-                <p><strong>Status:</strong> ${task.status}</p>
-                <p><strong>Prioridade:</strong> ${task.priority_id? task.priority_id : 'N/A'}</p>
-                <p><strong>Categoria:</strong> ${task.category_id? task.category_id : 'N/A'}</p>
-                `;
+                <p><strong>Status:</strong> <span class="status ${statusClass}">${task.status}</span></p>
+                <p><strong>Prioridade:</strong> <span class="priority ${priorityClass}">${task.priority_name || 'N/A'}</span></p>
+                <p><strong>Categoria:</strong> ${task.category_name || 'N/A'}</p>
+                <div class="task-actions">
+                    <button class="update-status-btn" data-status="${task.status}">Atualizar Status</button>
+                    <button class="delete-btn">Excluir</button>
+                </div>
+            `;
             ul.appendChild(li);
+        });
+
+        
+        taskListContainer.addEventListener('click', async (event) => {
+            if (event.target.classList.contains('delete-btn')) {
+                const taskId = event.target.closest('.task-item').dataset.taskId;
+                if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+                    await deleteTask(taskId);
+                }
+            }
+            if (event.target.classList.contains('update-status-btn')) {
+                const taskId = event.target.closest('.task-item').dataset.taskId;
+                const currentStatus = event.target.dataset.status;
+                const newStatus = prompt('Digite o novo status (Pendente, Em Progresso, Concluída, Cancelada):', currentStatus);
+                if (newStatus) {
+                    await updateTaskStatus(taskId, newStatus);
+                }
+            }
         });
 
         taskListContainer.appendChild(ul);
@@ -124,14 +151,84 @@ async function addNewTask(event) {
     }
 }
 
+async function fetchAndDisplayStatusSummary() {
+    const summaryContainer = document.getElementById('status-summary-container');
+    summaryContainer.innerHTML = '<p>Carregando resumo...</p>';
+
+    try {
+        const response = await fetch('/api/tasks/summary/status');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const summary = await response.json();
+
+        summaryContainer.innerHTML = '';
+        if (summary.length === 0) {
+            summaryContainer.innerHTML = '<p>Nenhum resumo de status encontrado.</p>';
+            return;
+        }
+
+        const ul = document.createElement('ul');
+        summary.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = `${item.status}: ${item.total_tasks} tarefas`;
+            ul.appendChild(li);
+        });
+        summaryContainer.appendChild(ul);
+
+    } catch (error) {
+        console.error('Erro ao buscar resumo de status:', error);
+        summaryContainer.innerHTML = `<p style="color: red;">Erro ao carregar resumo: ${error.message}</p>`;
+    }
+}
+
+async function deleteTask(taskId) {
+    try {
+        const response = await fetch(`/api/tasks/${taskId}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) {
+            throw new Error(`Erro ao excluir tarefa: ${response.statusText}`);
+        }
+        console.log(`Tarefa ${taskId} excluída com sucesso.`);
+        fetchAndDisplayTasks();
+        fetchAndDisplayStatusSummary();
+    } catch (error) {
+        console.error('Erro ao excluir tarefa:', error);
+        alert(`Não foi possível excluir a tarefa: ${error.message}`);
+    }
+}
+
+async function updateTaskStatus(taskId, newStatus) {
+    try {
+        const response = await fetch(`/api/tasks/${taskId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ novo_status: newStatus }),
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Erro ao atualizar status: ${errorData.error || response.statusText}`);
+        }
+        console.log(`Status da tarefa ${taskId} atualizado para ${newStatus}.`);
+        fetchAndDisplayTasks();
+        fetchAndDisplayStatusSummary();
+    } catch (error) {
+        console.error('Erro ao atualizar status:', error);
+        alert(`Não foi possível atualizar o status: ${error.message}`);
+    }
+}
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetchAndDisplayTasks(); 
-    populateDropdowns();   
+    fetchAndDisplayTasks();
+    populateDropdowns();
+    fetchAndDisplayStatusSummary(); 
 
     const taskForm = document.getElementById('task-form');
     if (taskForm) {
-        taskForm.addEventListener('submit', addNewTask); 
+        taskForm.addEventListener('submit', addNewTask);
     }
 });

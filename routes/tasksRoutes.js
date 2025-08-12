@@ -6,7 +6,7 @@ const { pool } = require('../config/supabaseClient');
 router.get('/', async (req, res) => {
     try {
         const client = await pool.connect();
-        const result = await client.query('SELECT task_id, title, description, due_date, status, category_id, priority_id, created_at, updated_at FROM Tasks ORDER BY due_date ASC, created_at ASC;');
+        const result = await client.query('SELECT task_id, title, description, due_date, status, category_id, priority_id, created_at, updated_at FROM tasks ORDER BY due_date ASC, created_at ASC;');
         client.release();
         res.json(result.rows);
     } catch (err) {
@@ -130,6 +130,47 @@ router.delete('/:id', async (req, res) => {
     } catch (err) {
         console.error('Erro ao excluir tarefa:', err.stack);
         res.status(500).json({ error: 'Erro interno do servidor ao excluir tarefa.' });
+    }
+});
+
+// Listar tarefas com detalhes de categoria e prioridade (JOIN)
+router.get('/details', async (req, res) => {
+    try {
+        const client = await pool.connect();
+        const queryText = `
+            SELECT
+                t.task_id,
+                t.title,
+                t.description,
+                t.due_date,
+                t.status,
+                c.category_name,
+                p.priority_name
+            FROM tasks t
+            LEFT JOIN categories c ON t.category_id = c.category_id  -- Agora inclui NULLs
+            LEFT JOIN priorities p ON t.priority_id = p.priority_id  -- Agora inclui NULLs
+            ORDER BY t.due_date ASC;
+        `;
+        const result = await client.query(queryText);
+        client.release();
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Erro ao listar tarefas com detalhes:', err.stack);
+        res.status(500).json({ error: 'Erro interno do servidor ao listar tarefas com detalhes.' });
+    }
+});
+
+
+// Contar tarefas por status (GROUP BY)
+router.get('/summary/status', async (req, res) => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT status, COUNT(*) AS total_tasks FROM tasks GROUP BY status;');
+        client.release();
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Erro ao obter resumo de status:', err.stack);
+        res.status(500).json({ error: 'Erro interno do servidor ao obter resumo de status.' });
     }
 });
 
