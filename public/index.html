@@ -49,6 +49,24 @@
             <button type="submit">Adicionar Tarefa</button>
         </form>
 
+            <div class="section">
+                <h2>Gerenciar Categorias</h2>
+                <form id="categoryForm">
+                    <input type="text" id="categoryNameInput" placeholder="Nome da Categoria" required>
+                    <button type="submit">Adicionar</button>
+                </form>
+                <ul id="categoryList"></ul>
+            </div>
+
+            <div class="section">
+                <h2>Gerenciar Prioridades</h2>
+                <form id="priorityForm">
+                    <input type="text" id="priorityNameInput" placeholder="Nome da Prioridade" required>
+                    <input type="number" id="priorityLevelInput" placeholder="Nível (1 a 5)" required>
+                    <button type="submit">Adicionar</button>
+                </form>
+                <ul id="priorityList"></ul>
+            </div>
         <h2>Minhas Tarefas</h2>
         <div id="task-list-container">
             <p>Carregando tarefas...</p>

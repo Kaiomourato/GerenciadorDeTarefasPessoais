@@ -2,6 +2,8 @@ async function fetchAndDisplayTasks() {
     const taskListContainer = document.getElementById('task-list-container');
     taskListContainer.innerHTML = '<p>Carregando tarefas...</p>';
 
+    
+
     try {
         
         const response = await fetch('/api/tasks/details'); 
@@ -221,14 +223,134 @@ async function updateTaskStatus(taskId, newStatus) {
     }
 }
 
+async function fetchAndDisplayCategories() {
+    const categoryList = document.getElementById('categoryList');
+    categoryList.innerHTML = '';
+
+    const response = await fetch('/api/categories');
+    const categories = await response.json();
+
+    categories.forEach(category => {
+        const li = document.createElement('li');
+        li.className = 'list-item';
+        li.innerHTML = `
+            <span>${category.category_name}</span>
+            <div>
+                <button onclick="editCategory('${category.category_id}', '${category.category_name}')">Editar</button>
+                <button onclick="deleteCategory('${category.category_id}')">Excluir</button>
+            </div>
+        `;
+        categoryList.appendChild(li);
+    });
+}
+
+async function createCategory(event) {
+    event.preventDefault();
+    const categoryName = document.getElementById('categoryNameInput').value;
+    await fetch('/api/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category_name: categoryName })
+    });
+    document.getElementById('categoryNameInput').value = '';
+    fetchAndDisplayCategories();
+}
+
+async function editCategory(id, currentName) {
+    const newName = prompt('Novo nome para a categoria:', currentName);
+    if (newName && newName !== currentName) {
+        await fetch(`/api/categories/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ category_name: newName })
+        });
+        fetchAndDisplayCategories();
+    }
+}
+
+async function deleteCategory(id) {
+    if (confirm('Tem certeza que deseja excluir esta categoria?')) {
+        await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+        fetchAndDisplayCategories();
+    }
+}
+
+async function fetchAndDisplayPriorities() {
+    const priorityList = document.getElementById('priorityList');
+    priorityList.innerHTML = '';
+    const response = await fetch('/api/priorities');
+    const priorities = await response.json();
+
+    priorities.forEach(priority => {
+        const li = document.createElement('li');
+        li.className = 'list-item';
+        li.innerHTML = `
+            <span>${priority.priority_name} (Nível: ${priority.priority_level})</span>
+            <div>
+                <button onclick="editPriority('${priority.priority_id}', '${priority.priority_name}', ${priority.priority_level})">Editar</button>
+                <button onclick="deletePriority('${priority.priority_id}')">Excluir</button>
+            </div>
+        `;
+        priorityList.appendChild(li);
+    });
+}
+
+async function createPriority(event) {
+    event.preventDefault();
+    const priorityName = document.getElementById('priorityNameInput').value;
+    const priorityLevel = document.getElementById('priorityLevelInput').value;
+    await fetch('/api/priorities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priority_name: priorityName, priority_level: parseInt(priorityLevel) })
+    });
+    document.getElementById('priorityNameInput').value = '';
+    document.getElementById('priorityLevelInput').value = '';
+    fetchAndDisplayPriorities();
+}
+
+async function editPriority(id, currentName, currentLevel) {
+    const newName = prompt('Novo nome para a prioridade:', currentName);
+    const newLevel = prompt('Novo nível para a prioridade:', currentLevel);
+    if (newName && newName !== currentName || newLevel && newLevel !== currentLevel) {
+        await fetch(`/api/priorities/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ priority_name: newName, priority_level: parseInt(newLevel) })
+        });
+        fetchAndDisplayPriorities();
+    }
+}
+
+async function deletePriority(id) {
+    if (confirm('Tem certeza que deseja excluir esta prioridade?')) {
+        await fetch(`/api/priorities/${id}`, { method: 'DELETE' });
+        fetchAndDisplayPriorities();
+    }
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
+    
     fetchAndDisplayTasks();
     populateDropdowns();
-    fetchAndDisplayStatusSummary(); 
+    fetchAndDisplayStatusSummary();
+    fetchAndDisplayCategories(); 
+    fetchAndDisplayPriorities(); 
 
     const taskForm = document.getElementById('task-form');
     if (taskForm) {
         taskForm.addEventListener('submit', addNewTask);
+    }
+
+   
+    const categoryForm = document.getElementById('categoryForm');
+    if (categoryForm) {
+        categoryForm.addEventListener('submit', createCategory);
+    }
+
+    const priorityForm = document.getElementById('priorityForm');
+    if (priorityForm) {
+        priorityForm.addEventListener('submit', createPriority);
     }
 });
