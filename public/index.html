@@ -123,6 +123,50 @@
             </button>
             <div id="taskCountResultFunction"></div>
         </section>
+
+        <div id="editTaskModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Editar Tarefa</h2>
+                <form id="edit-task-form">
+                    <input type="hidden" id="edit-task-id">
+                    <div class="form-group">
+                        <label for="edit-title">Título</label>
+                        <input type="text" id="edit-title" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-description">Descrição</label>
+                        <textarea id="edit-description" name="description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-due_date">Vencimento</label>
+                        <input type="date" id="edit-due_date" name="due_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-status">Status</label>
+                        <select id="edit-status" name="status">
+                            <option value="Pendente">Pendente</option>
+                            <option value="Em Progresso">Em Progresso</option>
+                            <option value="Concluída">Concluída</option>
+                            <option value="Cancelada">Cancelada</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-category_id">Categoria</label>
+                        <select id="edit-category_id" name="category_id">
+                            <option value="">Nenhuma</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-priority_id">Prioridade</label>
+                        <select id="edit-priority_id" name="priority_id">
+                            <option value="">Nenhuma</option>
+                        </select>
+                    </div>
+                    <button type="submit">Salvar Alterações</button>
+                </form>
+            </div>
+        </div>
     </main>
     <footer>
         <p>&copy; 2025 TaskFlow - Sistema de Gerenciamento de Tarefas</p>
