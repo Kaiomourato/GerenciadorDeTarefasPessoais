@@ -41,7 +41,7 @@ A aplicação foi projetada para atender aos requisitos mínimos da disciplina:
 
 O banco de dados é composto por 5 tabelas interligadas:
 
-![Diagrama do Banco de Dados](./supabase-schema-dfxcykmesxqihijehgrl (1).png)
+![Diagrama do Banco de Dados](./supabase.png)
 
 - **users** → informações dos usuários  
 - **priorities** → prioridades das tarefas  
